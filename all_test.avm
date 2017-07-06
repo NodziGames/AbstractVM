@@ -1,19 +1,5 @@
 ;This is a comment. It shouldn't be placed in the instruction Vector.
-push int8(5) ;STACK -> 5
-push int16(16) ;STACK -> 16, 5
-push int32(32) ;STACK -> 32, 16, 5
-push float(1.1) ;STACK -> 1.1, 32, 16, 5
-push double(1.11) ;STACK -> 1.11 ,1.1, 32, 16, 5
-pop ;STACK -> 1.1, 32, 16, 5
-dump ;STACK -> 1.1, 32, 16, 5
-assert float(1.1) ;STACK -> 1.1, 32, 16, 5
-add ;STACK -> 33.1, 16, 5
-sub ;STACK -> 17.1, 5
-mul; ;STACK -> 85.5
-push int16(171) ;STACK -> 171, 85.5
-print ;Checks if top value is 8-bit int, if not, print as ASCII value
-div ;STACK-> 2
-push int16(8) ;STACK -> 8, 2
-mod ;STACK -> 0
-dump ;Prints out STACK
-exit ;Cleanly Quits
+push float(1.5)
+push int8(6)
+add
+dump

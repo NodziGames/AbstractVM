@@ -2,15 +2,15 @@
 
 std::string check_command_type(std::string command)
 {
-    if (command.find("push int8") != std::string::npos)
+    if (command.find("push") != std::string::npos && command.find("int8") != std::string::npos)
         return ("push int8");
-    else if (command.find("push int16") != std::string::npos)
+    else if (command.find("push") != std::string::npos && command.find("int16") != std::string::npos)
         return ("push int16");
-    else if (command.find("push int32") != std::string::npos)
+    else if (command.find("push") != std::string::npos && command.find("int32") != std::string::npos)
         return ("push int32");
-    else if (command.find("push float") != std::string::npos)
+    else if (command.find("push") != std::string::npos && command.find("float") != std::string::npos)
         return ("push float");
-    else if (command.find("push double") != std::string::npos)
+    else if (command.find("push") != std::string::npos && command.find("double") != std::string::npos)
         return ("push double");
     else if (command.find("pop") != std::string::npos)
         return ("pop");

@@ -4,7 +4,7 @@ SRC = src/*.cpp
 
 OBJ = *.o
 
-C_FLAGS = -Wall -Werror -Wextra
+C_FLAGS = -Wall -Werror -Wextra -g3
 
 INCL = include/
 

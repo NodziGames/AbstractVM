@@ -62,7 +62,7 @@ int     main(int argc, char **argv)
         {
             if (verbose == true)
                 std::cout << "//Popping Top Value From Stack" << std::endl;
-            pop();
+            stack = pop(stack);
         }
         else if (check_command_type(commands[i]) == "dump")
         {
@@ -80,7 +80,7 @@ int     main(int argc, char **argv)
         {
             if (verbose == true)
                 std::cout << "//Adding Top Two Values Of Stack" << std::endl;
-            add();
+            stack = add(stack);
         }
         else if (check_command_type(commands[i]) == "sub")
         {
@@ -122,6 +122,5 @@ int     main(int argc, char **argv)
     }
     /*for (size_t i = 0; i < stack.size(); i++)
         std::cout << "On stack: " << stack[i]->toString() << std::endl;*/
-
     return (0);
 }

@@ -72,7 +72,7 @@ class TOperand : public IOperand
 			
 			long double value;
 
-			value = std::stol(this->_value) + std::stol(rhs.toString());
+			value = std::stold(this->_value) + std::stold(rhs.toString());
 
 			try
 			{
