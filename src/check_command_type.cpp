@@ -30,7 +30,7 @@ std::string check_command_type(std::string command)
         return ("mod");
     else if (command.find("print") != std::string::npos)
         return ("print");
-    else if (command.find("exit") != std::string::npos)
+    else if (command.find("exit") != std::string::npos || command.find(";;") != std::string::npos)
         return ("exit");
     else
         return ("Nothing");

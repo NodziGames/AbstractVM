@@ -18,18 +18,11 @@ OperandFactory::~OperandFactory()
 	return ;
 }
 
-/*OperandFactory &        OperandFactory::operator=(OperandFactory const & rhs)
-{
-	dynamic_cast<void>(rhs);
-	return (rhs);
-}*/
-
 IOperand const *		OperandFactory::createOperand(eOperandType type, std::string const & value)
 {
 	/* CHANGE TO ARRAY */
 	Create iop[5] = {&OperandFactory::createInt8, &OperandFactory::createInt16,
 	&OperandFactory::createInt32, &OperandFactory::createFloat, &OperandFactory::createDouble};
-
 	return ((this->*iop[type])(value));
 }
 

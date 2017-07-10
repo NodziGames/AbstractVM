@@ -1,5 +1,0 @@
-;This is a comment. It shouldn't be placed in the instruction Vector.
-push float(1.5)
-push int8(6)
-add
-dump

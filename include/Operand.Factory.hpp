@@ -10,7 +10,6 @@ class   OperandFactory
 		OperandFactory(OperandFactory const & src);
 		virtual ~OperandFactory();
 
-		/*OperandFactory &		operator=(OperandFactory const & rhs);*/
 
 		IOperand const *        createOperand(eOperandType type, std::string const & value);
 

@@ -1,5 +1,6 @@
 #include <AbstractVM.hpp>
 #include <cfloat>
+#include <float.h>
 
 template <eOperandType operandType, typename T>
 class TOperand : public IOperand
@@ -10,7 +11,7 @@ class TOperand : public IOperand
 		{
 			virtual const char * what() const throw()
 			{
-				return ("Dividing by zero is undefined.");
+				return ("Dividing || Mod by zero is undefined.");
 			}
 		} Div0E;
 		class		OverflowException : public std::exception
@@ -24,18 +25,31 @@ class TOperand : public IOperand
 		//Constructor
 		TOperand(std::string value) : _value(value)
 		{
-			checkOverflow(std::stol(this->_value), this->getType());
+			checkOverflow(std::stold(this->_value), this->getType());
 			return ;
+		}
+
+		TOperand(TOperand const & rhs)
+		{
+			*this = rhs;
 		}
 
 		virtual ~TOperand(void)
 		{
 			return ;
 		}
+
 		IOperand const	* createInstance(long double value, eOperandType type) const
 		{
 			// Convert value to string and pass it to new class instance.
+			std::string newStr = std::to_string(value);
 			std::string newValue = std::to_string(value);
+			int i;
+			for (i = newStr.length() - 1; newStr[i] == '0'; i--)
+				;
+			if (newStr[i] != '.')
+				i++;
+			newValue = newStr.substr(0, i);
 			if (type == INT8)
 				return (new TOperand<INT8, int8_t>(newValue));
 			else if (type == INT16)
@@ -44,23 +58,17 @@ class TOperand : public IOperand
 				return (new TOperand<INT32, int32_t>(newValue));
 			else if (type == FLOAT)
 				return (new TOperand<FLOAT, float>(newValue));
-			else
+			else if (type == DOUBLE)
 				return (new TOperand<DOUBLE, double>(newValue));
+			return (new TOperand<INT8, int8_t>(newValue));
 		}
 		TOperand const * 	operator=(IOperand const & rhs) const // Set rhs value = to lhs value
 		{
-			try
-			{
 				long double value;
 				// Convert value to number from string
-				value = std::stol(rhs.toString()); 
+				value = std::stold(rhs.toString()); 
 				checkOverflow(value, rhs.getType());
 				return (createInstance(value, rhs.getType()));
-			}
-			catch (std::exception & e)
-			{
-				std::cout << e.what() << std::endl;
-			}
 		}
 
 		TOperand const * 	operator+(IOperand const & rhs) const
@@ -74,20 +82,12 @@ class TOperand : public IOperand
 
 			value = std::stold(this->_value) + std::stold(rhs.toString());
 
-			try
+			if (this->getPrecision() < rhs.getPrecision())
 			{
-				if (this->getPrecision() < rhs.getPrecision())
-				{
-					checkOverflow(value, rhs.getType());
-					return (dynamic_cast<TOperand const *>(createInstance(value, rhs.getType())));
-				}
-				checkOverflow(value, this->getType());
-				return (dynamic_cast<TOperand const *>(createInstance(value, this->getType())));
+				checkOverflow(value, rhs.getType());
+				return (reinterpret_cast<TOperand const *>(createInstance(value, rhs.getType())));
 			}
-			catch (std::exception & e)
-			{
-				std::cout << e.what() << std::endl;
-			}
+			checkOverflow(value, this->getType());
 			return (dynamic_cast<TOperand const *>(createInstance(value, this->getType())));
 		}
 
@@ -97,22 +97,14 @@ class TOperand : public IOperand
 
 			long double value;
 
-			value = std::stol(this->_value) - std::stol(rhs.toString());
+			value = std::stold(this->_value) - std::stold(rhs.toString());
 
-			try
+			if (this->getPrecision() < rhs.getPrecision())
 			{
-				if (this->getPrecision() < rhs.getPrecision())
-				{
-					checkOverflow(value, rhs.getType());
-					return (dynamic_cast<TOperand const *>(createInstance(value, rhs.getType())));
-				}
-				checkOverflow(value, this->getType());
-				return (dynamic_cast<TOperand const *>(createInstance(value, this->getType())));
+				checkOverflow(value, rhs.getType());
+				return (reinterpret_cast<TOperand const *>(createInstance(value, rhs.getType())));
 			}
-			catch (std::exception & e)
-			{
-				std::cout << e.what() << std::endl;
-			}
+			checkOverflow(value, this->getType());
 			return (dynamic_cast<TOperand const *>(createInstance(value, this->getType())));
 		}
 
@@ -120,22 +112,14 @@ class TOperand : public IOperand
 		{
 			long double value;
 
-			value = std::stol(this->_value) * std::stol(rhs.toString());
+			value = std::stold(this->_value) * std::stold(rhs.toString());
 
-			try
+			if (this->getPrecision() < rhs.getPrecision())
 			{
-				if (this->getPrecision() < rhs.getPrecision())
-				{
-					checkOverflow(value, rhs.getType());
-					return (dynamic_cast<TOperand const *>(createInstance(value, rhs.getType())));
-				}
-				checkOverflow(value, this->getType());
-				return (dynamic_cast<TOperand const *>(createInstance(value, this->getType())));
+				checkOverflow(value, rhs.getType());
+				return (reinterpret_cast<TOperand const *>(createInstance(value, rhs.getType())));
 			}
-			catch (std::exception & e)
-			{
-				std::cout << e.what() << std::endl;
-			}
+			checkOverflow(value, this->getType());
 			return (dynamic_cast<TOperand const *>(createInstance(value, this->getType())));
 
 		}
@@ -145,24 +129,15 @@ class TOperand : public IOperand
 			// In addition to the other overloads % && / need to have a check on div/mod == 0
 
 			long double value;
-
-			checkDiv0(std::stol(rhs.toString()));
-			value = std::stol(this->_value) / std::stol(rhs.toString());
-
-			try
+			
+			checkDiv0(std::stold(rhs.toString()));
+			value = std::stold(this->_value) / std::stold(rhs.toString());
+			if (this->getPrecision() < rhs.getPrecision())
 			{
-				if (this->getPrecision() < rhs.getPrecision())
-				{
-					checkOverflow(value, rhs.getType());
-					return (dynamic_cast<TOperand const *>(createInstance(value, rhs.getType())));
-				}
-				checkOverflow(value, this->getType());
-				return (dynamic_cast<TOperand const *>(createInstance(value, this->getType())));
+				checkOverflow(value, rhs.getType());
+				return (reinterpret_cast<TOperand const *>(createInstance(value, rhs.getType())));
 			}
-			catch (std::exception & e)
-			{
-				std::cout << e.what() << std::endl;
-			}
+			checkOverflow(value, this->getType());
 			return (dynamic_cast<TOperand const *>(createInstance(value, this->getType())));
 		}
 
@@ -170,23 +145,14 @@ class TOperand : public IOperand
 		{
 			long double value;
 
-			checkDiv0(std::stol(rhs.toString()));
-			value = std::stol(this->_value) % std::stol(rhs.toString());
-
-			try
+			checkDiv0(std::stold(rhs.toString()));
+			value = std::fmod(std::stold(this->_value), std::stold(rhs.toString()));
+			if (this->getPrecision() < rhs.getPrecision())
 			{
-				if (this->getPrecision() < rhs.getPrecision())
-				{
-					checkOverflow(value, rhs.getType());
-					return (dynamic_cast<TOperand const *>(createInstance(value, rhs.getType())));
-				}
-				checkOverflow(value, this->getType());
-				return (dynamic_cast<TOperand const *>(createInstance(value, this->getType())));
+				checkOverflow(value, rhs.getType());
+				return (reinterpret_cast<TOperand const *>(createInstance(value, rhs.getType())));
 			}
-			catch (std::exception & e)
-			{
-				std::cout << e.what() << std::endl;
-			}
+			checkOverflow(value, this->getType());
 			return (dynamic_cast<TOperand const *>(createInstance(value, this->getType())));
 		}
 
@@ -203,11 +169,11 @@ class TOperand : public IOperand
 				throw Oexep;
 			else if (type == INT16 && (value < INT16_MIN || value > INT16_MAX))
 				throw Oexep;
-			else if (type ==INT32 && (value < INT32_MIN || value > INT32_MAX))
+			else if (type == INT32 && (value < INT32_MIN || value > INT32_MAX))
 				throw Oexep;
-			else if (type == FLOAT && (value < FLT_MIN || value > FLT_MAX))
+			else if (type == FLOAT && (value < -1.175494e+37 || value > 3.40282e+38))
 				throw Oexep;
-			else if (type ==DOUBLE && (value < DBL_MIN|| value > DBL_MAX))
+			else if (type == DOUBLE && (value < -2.22507e+307 || value > 1.79769e+308))
 				throw Oexep;
 		}
 
@@ -233,16 +199,9 @@ class TOperand : public IOperand
 				return (FLOAT);
 			return (DOUBLE);
 		}
-		
+
 	private:
 
 		T					_type;
 		std::string			_value;
 };
-
-
-/*std::ostream const &	operator<<(std::ostream const & o, IOperand const & rhs)
-{
-	o << rhs.toString();
-	return (o);
-}*/
