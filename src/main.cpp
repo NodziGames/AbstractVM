@@ -1,6 +1,8 @@
 #include <AbstractVM.hpp>
 #include <cfloat>
 
+void do_commands(std::string line);
+
 OperandFactory factory;
 std::deque<IOperand const *> stack;
 std::vector<std::string> commands;
@@ -16,130 +18,54 @@ void    clearStack(std::deque<IOperand const *> & stack)
 
 int     main(int argc, char **argv)
 {
-    bool verbose = false;
-
-    if (argc == 3)
+    if (argc > 2)
     {
-        if (strcmp("-v", argv[2]) == 0)
-            verbose = true;
-    }
-    else
-        verbose = false;
-
-    if (argc < 2)
-    {
-        std::cout << "Invalid usage! Ex: " << argv[0] << " commands.avm optional[-v]" << std::endl;
+        std::cout << "Invalid usage! Ex: " << argv[0] << " optional[commands.avm]" << std::endl;
         return (0);
     }
 
     try
     {
-        commands = parse(argv[1], excep2);
-
-        if (commands[0] == "failed")
+        if (argc == 2)
         {
-            std::cout << "One or more Syntax errors has been detected. Please resolve these and try running again!" << std::endl;
-            return (0);
+            commands = parse(argv[1], excep2);
+
+            if (commands[0] == "failed")
+            {
+                std::cout << "One or more Syntax errors has been detected. Please resolve these and try running again!" << std::endl;
+                return (0);
+            }
+
+            size_t i;
+            //Iterate Through Commands And Execute Them!
+            for (i = 0; i < commands.size(); i++)
+            {
+                std::cout << commands[i] << std::endl;
+                do_commands(commands[i]);
+            }
+            if (check_command_type(commands[i - 1]) != "exit")
+                excep2.throwNoExit();
         }
 
-        size_t i;
-        //Iterate Through Commands And Execute Them!
-        for (i = 0; i < commands.size(); i++)
+        if (argc == 1) //If VM is run without commands
         {
-            std::cout << commands[i] << std::endl;
-            if (check_command_type(commands[i]) == "push int8")
+            std::string line;
+            std::cout << "Enter command: ";
+            while (getline(std::cin, line))
             {
-                if (verbose == true)
-                    std::cout << "//Adding 8-bit Int To Stack" << std::endl;
-                push_int8(commands[i], stack, factory);
-            }
-            else if (check_command_type(commands[i]) == "push int16")
-            {
-                if (verbose == true)
-                    std::cout << "//Adding 16-bit Int To Stack" << std::endl;
-                push_int16(commands[i], stack, factory);
-            }
-            else if (check_command_type(commands[i]) == "push int32")
-            {
-                if (verbose == true)
-                    std::cout << "//Adding 32-bit Int To Stack" << std::endl;
-                push_int32(commands[i], stack, factory);
-            }
-            else if (check_command_type(commands[i]) == "push float")
-            {
-                if (verbose == true)
-                    std::cout << "//Adding Float To Stack" << std::endl;
-                push_float(commands[i], stack, factory);
-            }
-            else if (check_command_type(commands[i]) == "push double")
-            {
-                if (verbose == true)
-                    std::cout << "//Adding Double To Stack" << std::endl;
-                push_double(commands[i], stack, factory);
-            }
-            else if (check_command_type(commands[i]) == "pop")
-            {
-                if (verbose == true)
-                    std::cout << "//Popping Top Value From Stack" << std::endl;
-                pop(stack);
-            }
-            else if (check_command_type(commands[i]) == "dump")
-            {
-                if (verbose == true)
-                    std::cout << "//Dumping All Stack Values To Screen" << std::endl;
-                dump(stack);
-            }
-            else if (check_command_type(commands[i]) == "assert")
-            {
-                if (verbose == true)
-                    std::cout << "//Asserting Top Value Of Stack" << std::endl;
-                assert(commands[i], stack);
-            }
-            else if (check_command_type(commands[i]) == "add")
-            {
-                if (verbose == true)
-                    std::cout << "//Adding Top Two Values Of Stack" << std::endl;
-                add(stack);
-            }
-            else if (check_command_type(commands[i]) == "sub")
-            {
-                if (verbose == true)
-                    std::cout << "//Subtracting Top Two Values Of Stack" << std::endl;
-                sub(stack);
-            }
-            else if (check_command_type(commands[i]) == "mul")
-            {
-                if (verbose == true)
-                    std::cout << "//Multiplying Top Two Values Of Stack" << std::endl;
-                mul(stack);
-            }
-            else if (check_command_type(commands[i]) == "div")
-            {
-                if (verbose == true)
-                    std::cout << "//Dividing Top Two Values Of Stack" << std::endl;
-                div(stack);
-            }
-            else if (check_command_type(commands[i]) == "mod")
-            {
-                if (verbose == true)
-                    std::cout << "//Modulus-ing Top Two Values Of Stack" << std::endl;
-                mod(stack);
-            }
-            else if (check_command_type(commands[i]) == "print")
-            {
-                if (verbose == true)
-                    std::cout << "//Using Print On Top Value Of Stack" << std::endl;
-                print(stack);
-            }
-            else if (check_command_type(commands[i]) == "exit" || check_command_type(commands[i]) == ";;")
-            {
-                if (verbose == true)
-                    std::cout << "//Exiting VM" << std::endl;
-                exit(stack);
+                line = remove_whitespace_front(line);
+                if (syntax_check(line) == 1)
+                {
+                    do_commands(line);
+                    std::cout << "Enter command: ";
+                }
+                else
+                {
+                    std::cout << "Failed: Syntax Error!" << std::endl;
+                    std::cout << "Enter command: ";
+                }
             }
         }
-        if (check_command_type(commands[i - 1]) != "exit")
-            excep2.throwNoExit();
     }
     catch (std::exception & e)
     {
@@ -148,4 +74,40 @@ int     main(int argc, char **argv)
     }
 
     return (0);
+}
+
+
+
+void    do_commands(std::string line)
+{
+    if (check_command_type(line) == "push int8")
+        push_int8(line, stack, factory);
+    else if (check_command_type(line) == "push int16")
+        push_int16(line, stack, factory);
+    else if (check_command_type(line) == "push int32")
+        push_int32(line, stack, factory);
+    else if (check_command_type(line) == "push float")
+        push_float(line, stack, factory);
+    else if (check_command_type(line) == "push double")
+        push_double(line, stack, factory);
+    else if (check_command_type(line) == "pop")
+        pop(stack);
+    else if (check_command_type(line) == "dump")
+        dump(stack);
+    else if (check_command_type(line) == "assert")
+        assert(line, stack);
+    else if (check_command_type(line) == "add")
+        add(stack);
+    else if (check_command_type(line) == "sub")
+        sub(stack);
+    else if (check_command_type(line) == "mul")
+        mul(stack);
+    else if (check_command_type(line) == "div")
+        div(stack);
+    else if (check_command_type(line) == "mod")
+        mod(stack);
+    else if (check_command_type(line) == "print")
+        print(stack);
+    else if (check_command_type(line) == "exit" || check_command_type(line) == ";;")
+        exit(stack);
 }

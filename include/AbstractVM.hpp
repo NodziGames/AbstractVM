@@ -31,3 +31,7 @@ void						    mod(std::deque<IOperand const *> & stack);
 void                            print(std::deque<IOperand const *> & stack);
 void                            exit(std::deque<IOperand const *> & stack);
 void							clearStack(std::deque<IOperand const *> & stack);
+
+int     syntax_check(std::string line);
+std::string remove_whitespace_front(std::string line);
+std::string trim(std::string line);

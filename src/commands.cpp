@@ -135,7 +135,6 @@ void    assert(std::string command, std::deque<IOperand const *> & stack)
 	if (stack[0]->getType() == type && std::strcmp(stack[0]->toString().c_str(),num.c_str()) == 0)
 	{
 		//Verbose trash
-		std::cout << "// Assert Passed" << std::endl;
 	}
 	else
 	{

@@ -8,7 +8,7 @@ const char * Exceptions::StackTooSmall::what() const throw()
 
 const char * Exceptions::NoExit::what() const throw()
 {
-	return ("Program lacks exit function. (╯°□°)╯︵ ┻━┻");
+	return ("Program requires exit function as last command. (╯°□°)╯︵ ┻━┻");
 }
 
 const char * Exceptions::AssertFail::what() const throw()

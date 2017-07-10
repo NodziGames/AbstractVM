@@ -1,0 +1,51 @@
+;Push Integers
+push int8(8)
+push int16(16)
+push int32(32)
+push int8(9)
+push int16(17)
+push int32(33)
+
+;Push Decimals
+push float(5.5)
+push float(6.5)
+push double(10.5)
+push double(11.5)
+
+dump ;Draw Everything
+
+;Do Some Equations
+add
+mul
+div
+mod
+sub
+
+dump
+
+;Print and assert
+push int8(67)
+print
+assert int8(67)
+push int16(305)
+assert int16(305)
+push int32(500)
+assert int32(500)
+push float(69.69)
+assert float(69.69)
+push double(169.169)
+assert double(169.169)
+
+dump
+
+;Pop Stuff From The Stack
+pop
+pop
+pop
+pop
+pop
+pop
+
+dump
+
+exit

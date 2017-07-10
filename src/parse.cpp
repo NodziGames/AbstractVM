@@ -7,7 +7,8 @@ int     syntax_check(std::string line)
     std::regex rgx_decimals("^push( +)(float|double)\\(-?[0-9]+(.[0-9]+)?\\)( *)");
     std::regex rgx_modifications("^(pop|dump|add|mul|sub|div|mod|print|exit)( *)");
     std::regex rgx_assert("^assert( +)(int(8|16|32)|float|double)\\(-?[0-9]+(.[0-9]+)?\\)( *)");
-    if (std::regex_match(line, rgx_ints) || std::regex_match(line, rgx_decimals) || std::regex_match(line, rgx_modifications) || std::regex_match(line, rgx_assert))
+    std::regex rgx_exit("( ?);;( *)");
+    if (std::regex_match(line, rgx_ints) || std::regex_match(line, rgx_decimals) || std::regex_match(line, rgx_modifications) || std::regex_match(line, rgx_assert) || std::regex_match(line, rgx_exit))
         return (1);
     else
         return (0);
@@ -27,7 +28,8 @@ std::string remove_whitespace_front(std::string line)
 std::string trim(std::string line)
 {
     std::string newstr;
-    int comment_start;
+    int comment_start = 0;
+
     comment_start = line.find_first_of(";");
     newstr = line.substr(0, comment_start);
     return (newstr);
